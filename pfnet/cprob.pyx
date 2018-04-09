@@ -103,9 +103,22 @@ cdef class Problem:
         if cprob.PROB_has_error(self._c_prob):
             raise ProblemError(cprob.PROB_get_error_string(self._c_prob))
 
-    def add_heuristic(self,htype):
+    def add_heuristic(self, HeuristicBase heur):
+        """
+        Adds heuristic to optimization problem.
 
-        cprob.PROB_add_heur(self._c_prob,htype)
+        Parameters
+        ----------
+        func : |HeuristicBase|
+        """
+        
+        # Prevent __dealloc__ of heuristic
+        heur._alloc = False
+        
+        # Add heuristic to problem
+        cprob.PROB_add_heur(self._c_prob, heur._c_heur)
+        if cprob.PROB_has_error(self._c_prob):
+            raise ProblemError(cprob.PROB_get_error_string(self._c_prob))
 
     def analyze(self):
         """
@@ -119,7 +132,7 @@ cdef class Problem:
 
     def apply_heuristics(self, var_values):
         """
-        Applies heuristic.
+        Applies heuristics.
 
         Parameters
         ----------
@@ -365,6 +378,16 @@ cdef class Problem:
                 flist.append(new_Function(f))
                 f = cfunc.FUNC_get_next(f)
             return flist
+
+    property heuristics:
+        """ List of |HeuristicBase| objects of this optimization problem (list). """
+        def __get__(self):
+            hlist = []
+            cdef cheur.Heur* h = cprob.PROB_get_heur(self._c_prob)
+            while h is not NULL:
+                hlist.append(new_Heuristic(h))
+                h = cheur.HEUR_get_next(h)
+            return hlist
 
     property A:
         """ Constraint matrix of linear equality constraints (|CooMatrix|). """

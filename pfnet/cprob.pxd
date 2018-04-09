@@ -11,6 +11,7 @@ cdef extern from "pfnet/problem.h":
     ctypedef struct Prob
     ctypedef struct Constr
     ctypedef struct Func
+    ctypedef struct Heur
     ctypedef struct Net
     ctypedef struct Vec
     ctypedef struct Mat
@@ -18,7 +19,7 @@ cdef extern from "pfnet/problem.h":
         
     void PROB_add_constr(Prob* p, Constr* c)
     void PROB_add_func(Prob* p, Func* f)
-    void PROB_add_heur(Prob* p, int htype)
+    void PROB_add_heur(Prob* p, Heur* h)
     void PROB_analyze(Prob* p)
     void PROB_apply_heuristics(Prob* p, Vec* point)
     void PROB_eval(Prob* p, Vec* point)
@@ -31,6 +32,7 @@ cdef extern from "pfnet/problem.h":
     Constr* PROB_get_constr(Prob* p)
     char* PROB_get_error_string(Prob* p)
     Func* PROB_get_func(Prob* p)
+    Heur* PROB_get_heur(Prob* p)
     Vec* PROB_get_init_point(Prob* p)
     Vec* PROB_get_upper_limits(Prob* p)
     Vec* PROB_get_lower_limits(Prob* p)

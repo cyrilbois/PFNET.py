@@ -50,6 +50,12 @@ cdef extern from "pfnet/pfnet.h":
     void FUNC_set_func_analyze_step(Func* f, void (*func)(Func* f, Branch* br, int t))
     void FUNC_set_func_eval_step(Func* f, void (*func)(Func* f, Branch* br, int t, Vec* v))
 
+    void* FUNC_get_data(Func* f)
+    void FUNC_set_data(Func* f, void* data)
+    
+    char* FUNC_get_bus_counted(Func* f)
+    int FUNC_get_bus_counted_size(Func* f)
+
     Func* FUNC_GEN_COST_new(REAL w, Net* net)
     Func* FUNC_LOAD_UTIL_new(REAL w, Net* net)
     Func* FUNC_NETCON_COST_new(REAL w, Net* net)
@@ -62,9 +68,3 @@ cdef extern from "pfnet/pfnet.h":
     Func* FUNC_SLIM_VMAG_new(REAL w, Net* net)
     Func* FUNC_SP_CONTROLS_new(REAL w, Net* net)
     Func* FUNC_REG_VAR_new(REAL w, Net* net)
-
-    void* FUNC_get_data(Func* f)
-    void FUNC_set_data(Func* f, void* data)
-    
-    char* FUNC_get_bus_counted(Func* f)
-    int FUNC_get_bus_counted_size(Func* f)

@@ -10,9 +10,6 @@
 
 cimport cheur
 
-# Types
-HEUR_TYPE_PVPQ = cheur.HEUR_TYPE_PVPQ
-
 class HeuristicError(Exception):
     """
     Heuristic error exception.
@@ -20,9 +17,75 @@ class HeuristicError(Exception):
 
     pass
 
-cdef class Heuristic:
+cdef class HeuristicBase:
     """
-    Heuristic class.
+    Base heuristic class.
     """
+    
+    cdef cheur.Heur* _c_heur
+    cdef bint _alloc
+    cdef Network _net
 
-    pass
+    def __init__(self):
+        """
+        Base heuristic class.
+        """
+
+        pass
+
+    def __cinit__(self):
+
+        self._c_heur = NULL
+        self._alloc = False
+        self._net = None
+
+    def __dealloc__(self):
+        """
+        Frees heuristic C data structure.
+        """
+
+        if self._alloc:
+            cheur.HEUR_del(self._c_heur)
+            self._c_heur = NULL
+            self._alloc = False
+            self._net = None
+
+    def apply(self, constraints, values):
+        """
+        Applies heuristic.
+
+        Parameters
+        ----------
+        constraints : 
+        values :
+        """
+
+        cdef np.ndarray[double,mode='c'] x = values
+
+        ## TODO
+
+    def clear_error(self):
+        """
+        Clears error flag and string.
+        """
+
+        cheur.HEUR_clear_error(self._c_heur)
+
+    property name:
+        """ Heuristic name (string). """
+        def __get__(self): return cheur.HEUR_get_name(self._c_heur).decode('UTF-8')
+        def __set__(self,name): 
+            name = name.encode('UTF-8')
+            cheur.HEUR_set_name(self._c_heur,name)
+
+    property network:
+        """ Network associated with heuristic (|Network|). """
+        def __get__(self): return new_Network(cheur.HEUR_get_network(self._c_heur))
+
+cdef new_Heuristic(cheur.Heur* h):
+    if h is not NULL:
+        heur = HeuristicBase()
+        heur._c_heur = h
+        return heur
+    else:
+        raise HeuristicError('invalid heuristic data')
